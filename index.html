@@ -2,213 +2,143 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Be My Valentine 💘</title>
   <meta name="theme-color" content="#ff4d6d" />
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-  <!-- QR Code lib (small & fast) -->
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
-          integrity="sha512-MnD3FJQYqB6E0zADr7k9dQj8CwI9Kp0MBb0+WJ6hXH3t7P4f2k8jUo0n+qV1Eo6Y2m2v0z9D4C0oT0zIu1xv2Q=="
-          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-  <!-- Confetti -->
-  <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <!-- Confetti + QR -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
     :root{
       --pink:#ff4d6d;
       --pink-deep:#ff2e63;
-      --cream:#fff7f9;
-      --shadow:0 18px 40px rgba(255,77,109,0.25);
+      --bg-a:#ffe3ea;
+      --bg-b:#fad0c4;
+      --shadow:0 18px 40px rgba(255,77,109,.25);
     }
-
     *{box-sizing:border-box}
-
     body{
-      margin:0;
-      min-height:100svh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background: radial-gradient(1200px 800px at 15% 10%, #ffe3ea 0%, #fad0c4 45%, #ff9a9e 100%);
+      margin:0; min-height:100svh;
+      display:flex; align-items:center; justify-content:center;
+      background: radial-gradient(1200px 800px at 20% 10%, var(--bg-a) 0%, var(--bg-b) 45%, #ff9a9e 100%);
       overflow:hidden;
       font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     }
 
-    /* Floating hearts backdrop */
-    .heart-field{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      z-index:0;
-      overflow:hidden;
-    }
+    /* Herzchen-Hintergrund */
+    .heart-field{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
     .floating-heart{
-      position:absolute;
-      color:#ff6b8f;
-      opacity:.18;
+      position:absolute; color:#ff6b8f; opacity:.18;
       font-size:clamp(18px, 2.8vmin, 36px);
-      animation: floatUp linear infinite;
-      filter: drop-shadow(0 2px 0 rgba(255,255,255,0.35));
+      animation:floatUp linear infinite;
+      filter: drop-shadow(0 2px 0 rgba(255,255,255,.35));
     }
     @keyframes floatUp{
-      0%{ transform: translateY(110vh) scale(1) rotate(0deg); opacity:.0; }
-      8%{ opacity:.25; }
-      92%{ opacity:.25; }
-      100%{ transform: translateY(-20vh) scale(1.3) rotate(360deg); opacity:0; }
+      0%{ transform:translateY(110vh) scale(1) rotate(0); opacity:0 }
+      8%,92%{ opacity:.25 }
+      100%{ transform:translateY(-20vh) scale(1.3) rotate(360deg); opacity:0 }
     }
 
-    /* Card */
+    /* Karte */
     .card{
-      position:relative;
-      z-index:2;
+      position:relative; z-index:2;
       width:min(92vw, 560px);
-      background: linear-gradient(145deg, rgba(255,255,255,0.9), rgba(255,255,255,0.82));
+      background: linear-gradient(145deg, rgba(255,255,255,.92), rgba(255,255,255,.85));
       backdrop-filter: blur(8px);
-      border-radius:28px;
-      padding:36px 26px 24px;
+      border-radius:28px; padding:30px 26px 20px;
       box-shadow: var(--shadow);
       border:1px solid rgba(255,255,255,.6);
       text-align:center;
     }
-
     h1.title{
-      font-family:'Pacifico', cursive;
-      font-weight:400;
-      color:var(--pink);
-      font-size: clamp(28px, 5.6vw, 44px);
-      line-height:1.2;
-      margin:6px auto 16px;
-      text-shadow: 0 2px 0 rgba(255,255,255,.7);
-    }
-
-    .subtitle{
-      color:#6b6b6b;
-      font-size: clamp(14px, 2.8vw, 16px);
-      margin-top:-6px;
+      font-family:'Pacifico', cursive; font-weight:400; margin:4px 0 12px;
+      color:var(--pink); font-size:clamp(28px, 6vw, 44px); line-height:1.2;
+      text-shadow:0 2px 0 rgba(255,255,255,.7);
     }
 
     .buttons{
-      margin-top:22px;
-      display:flex;
-      gap:14px;
-      justify-content:center;
-      align-items:center;
+      margin-top:18px;
+      display:flex; gap:22px; justify-content:center; align-items:center;
+      position:relative; z-index:2;
     }
-
     button{
       font:600 18px/1 'Poppins', sans-serif;
-      border:none;
-      padding:14px 28px;
-      border-radius:999px;
-      cursor:pointer;
-      transition: transform .18s ease, box-shadow .18s ease, background .2s ease, color .2s ease;
-      user-select:none;
-      touch-action:manipulation;
+      border:none; padding:14px 28px; border-radius:999px;
+      cursor:pointer; user-select:none; touch-action:manipulation;
+      transition:transform .18s ease, box-shadow .18s ease, background .2s ease, color .2s ease;
     }
     #yes{
       background:linear-gradient(180deg, var(--pink), var(--pink-deep));
-      color:white;
-      box-shadow: 0 10px 20px rgba(255,77,109,.35);
+      color:#fff; box-shadow:0 10px 20px rgba(255,77,109,.35);
     }
     #yes:hover{ transform: translateY(-2px) scale(1.03); }
     #yes:active{ transform: translateY(0) scale(.98); }
 
-    /* NO button lives globally to run across the whole page */
+    /* „No“ ist global positioniert, damit es über die Seite fliehen kann */
     #no{
-      position:fixed;
-      z-index:3;
-      left:50%;
-      top:50%;
-      transform: translate(-50%,-50%);
-      background:#fff;
-      color:#444;
+      position:fixed; z-index:3;
+      left:50%; top:50%; transform:translate(-50%,-50%);
+      background:#fff; color:#444;
       border:1px solid rgba(0,0,0,.06);
-      box-shadow: 0 10px 22px rgba(0,0,0,.14);
-      padding:12px 24px;
-      white-space:nowrap;
+      box-shadow:0 10px 22px rgba(0,0,0,.14);
+      padding:12px 24px; white-space:nowrap;
+      will-change: transform;
     }
 
-    .hint{
-      margin-top:10px;
-      color:#999;
-      font-size:14px;
-      font-style:italic;
-      letter-spacing:.2px;
-    }
+    .hint{ margin-top:10px; color:#999; font-size:14px; font-style:italic; letter-spacing:.2px; }
 
-    /* Yay section */
-    #yay{
-      display:none;
-      margin-top:10px;
-      animation: pop .4s ease-out;
-    }
-    @keyframes pop{
-      from{ transform: scale(.9); opacity:0; }
-      to{ transform: scale(1); opacity:1; }
-    }
-    #yay h2{
-      font-family:'Pacifico', cursive;
-      color:var(--pink);
-      font-size: clamp(28px, 6vw, 48px);
-      margin:6px 0 6px;
-    }
-    #yay p{
-      font-size: clamp(18px, 4.2vw, 22px);
-      margin:0 0 10px;
-    }
+    /* Yay */
+    #yay{ display:none; margin-top:10px; animation:pop .35s ease-out; }
+    @keyframes pop{ from{transform:scale(.92); opacity:0} to{transform:scale(1); opacity:1} }
+    #yay h2{ font-family:'Pacifico', cursive; color:var(--pink); font-size:clamp(28px,6vw,48px); margin:6px 0 8px; }
+    #yay p{ font-size:clamp(18px, 4.2vw, 22px); margin:0 0 10px; }
 
-    .celebration-img{
-      display:none;
-      width:min(86%, 340px);
-      border-radius:20px;
-      margin:10px auto 4px;
-      box-shadow: 0 12px 28px rgba(255,77,109,.25);
-      border: 6px solid #fff;
+    /* Foto-Container (zeigt PDF oder Bild) */
+    .celebration-wrap{ display:none; margin:10px auto 4px; }
+    .celebration-img, .celebration-pdf{
+      width:min(86%, 380px); height:auto; border-radius:20px; margin:0 auto;
+      box-shadow:0 12px 28px rgba(255,77,109,.25); border:6px solid #fff; display:block;
     }
+    .celebration-pdf{ height:420px; border-radius:18px; }
 
-    /* QR block */
-    .qr{
-      margin:18px auto 4px;
-      display:grid;
-      place-items:center;
-      gap:8px;
+    /* QR Icon (ohne Text) */
+    .qr-fab{
+      position:fixed; right:14px; top:14px; z-index:4;
+      background:#fff; border-radius:14px; padding:8px 10px;
+      border:1px solid rgba(0,0,0,.08); box-shadow:0 8px 22px rgba(0,0,0,.16);
+      cursor:pointer; user-select:none;
     }
-    .qr small{
-      color:#666;
+    .qr-modal{
+      position:fixed; inset:0; display:none; place-items:center; z-index:5;
+      background:rgba(0,0,0,.28);
+    }
+    .qr-card{
+      background:#fff; padding:16px 14px 12px; border-radius:16px; box-shadow: var(--shadow);
     }
     #qrcode > img, #qrcode > canvas{
-      width:120px !important;
-      height:120px !important;
-      image-rendering: pixelated;
-      border-radius:12px;
-      background:#fff;
-      padding:8px;
-      box-shadow: 0 6px 16px rgba(0,0,0,.12);
+      width:160px !important; height:160px !important; image-rendering:pixelated;
+      border-radius:12px; background:#fff; padding:8px; box-shadow:0 6px 16px rgba(0,0,0,.12);
     }
 
-    /* Accessibility */
-    button:focus-visible{
-      outline:3px solid rgba(255,77,109,.55);
-      outline-offset:3px;
-    }
+    button:focus-visible{ outline:3px solid rgba(255,77,109,.55); outline-offset:3px; }
   </style>
 </head>
 <body>
 
-  <!-- Floating hearts layer -->
+  <!-- Herzchen -->
   <div class="heart-field" aria-hidden="true" id="heartField"></div>
 
   <div class="card" role="dialog" aria-labelledby="title">
     <h1 class="title" id="title">Elisea, will you be my Valentine? 💖</h1>
-    <div class="subtitle">Für dich, mit ganz viel Liebe ✨</div>
 
     <div class="buttons" aria-live="polite" aria-atomic="true">
       <button id="yes" aria-label="Yes">Yes 💘</button>
-      <!-- NO is placed globally (fixed), but we also keep it logically part of UI -->
+      <!-- „No“ ist global fixiert; hier bleibt nur Yes -->
     </div>
 
     <div class="hint" id="noHint">no is shy</div>
@@ -216,29 +146,34 @@
     <div id="yay" aria-live="polite">
       <h2>YAAAY 🎉🥰</h2>
       <p>💃🕺💞</p>
-      <!-- Replace src with your own image or put /assets/cute.gif in your repo -->
-      <img id="celebrationGif" class="celebration-img" alt="Cute celebration"
-           src="assets/cute.gif" />
-    </div>
 
-    <div class="qr" aria-label="QR-Code zur Seite">
-      <div id="qrcode" title="Scanne mich"></div>
-      <small>Scanne den QR-Code – er zeigt direkt auf diese Seite.</small>
+      <!-- Foto-Container: zeigt automatisch PDF (object) oder Bild (img) -->
+      <div class="celebration-wrap" id="celebrationWrap">
+        <!-- Wird dynamisch befüllt -->
+      </div>
     </div>
   </div>
 
-  <!-- NO button (fixed so it can escape across the whole page) -->
+  <!-- NO Button (fixed, damit er über die ganze Seite fliehen kann) -->
   <button id="no" aria-label="No">No 🙈</button>
 
+  <!-- QR Icon + Modal (ohne sichtbaren Text im Layout) -->
+  <div class="qr-fab" id="qrFab" title="QR anzeigen">🔳</div>
+  <div class="qr-modal" id="qrModal" role="dialog" aria-modal="true" aria-label="QR-Code">
+    <div class="qr-card">
+      <div id="qrcode" title="Scanne mich"></div>
+    </div>
+  </div>
+
   <script>
-    // --- Floating hearts ---
+    /* ========== Herzchen-Hintergrund ========== */
     const field = document.getElementById('heartField');
     const HEARTS = 28;
     for (let i=0;i<HEARTS;i++){
       const el = document.createElement('div');
       el.className = 'floating-heart';
       el.textContent = '❤';
-      const left = Math.random()*100; // vw
+      const left = Math.random()*100;
       const delay = Math.random()*8;
       const dur = 10 + Math.random()*12;
       const scale = 0.7 + Math.random()*1.2;
@@ -249,115 +184,130 @@
       field.appendChild(el);
     }
 
-    // --- Elements ---
+    /* ========== Elemente ========== */
     const noBtn = document.getElementById('no');
     const yesBtn = document.getElementById('yes');
-    const yay = document.getElementById('yay');
-    const hint = document.getElementById('noHint');
-    const img = document.getElementById('celebrationGif');
+    const yay    = document.getElementById('yay');
+    const hint   = document.getElementById('noHint');
+    const wrap   = document.getElementById('celebrationWrap');
 
-    // Place NO initially near the card center
-    window.addEventListener('load', () => {
+    /* ========== Start-Positionen & Abstände ========== */
+    const MARGIN = 12;
+    const MIN_DISTANCE_TO_YES = 180; // kein Überlappen
+    const SAFE_RADIUS  = 150;        // Nähe in der der NO flieht
+    const PUSH_STRENGTH = 260;       // Flucht-Intensität
+    let pos = {x: window.innerWidth*0.72, y: window.innerHeight*0.58};
+    let target = {...pos};
+
+    // initial positionieren (rechts neben der Karte)
+    function placeNoInitial(){
       const card = document.querySelector('.card').getBoundingClientRect();
-      const nb = noBtn.getBoundingClientRect();
-      const x = card.left + card.width*0.62 - nb.width/2;
-      const y = card.top + card.height*0.62 - nb.height/2;
-      setNoPos(x, y);
-    });
-
-    // NO runs away logic
-    const SAFE_RADIUS = 130;   // distance (px) threshold to flee
-    const PUSH = 220;          // how far it jumps per flee
-    const MARGIN = 10;         // viewport margin
-
-    let grownOnce = false;
-
-    function setNoPos(x, y){
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const nb = noBtn.getBoundingClientRect();
-      const nx = Math.min(vw - nb.width - MARGIN, Math.max(MARGIN, x));
-      const ny = Math.min(vh - nb.height - MARGIN, Math.max(MARGIN, y));
-      noBtn.style.left = nx + 'px';
-      noBtn.style.top  = ny + 'px';
-      noBtn.style.transform = 'none';
+      const r = noBtn.getBoundingClientRect();
+      const x = Math.min(window.innerWidth - r.width - MARGIN, card.right + 24);
+      const y = Math.min(window.innerHeight - r.height - MARGIN, card.top + card.height*0.62);
+      pos = {x, y}; target = {...pos}; applyNo();
     }
 
-    function centerOf(el){
+    function applyNo(){
+      noBtn.style.left = pos.x + 'px';
+      noBtn.style.top  = pos.y + 'px';
+    }
+
+    function centerRect(el){
       const r = el.getBoundingClientRect();
-      return { x: r.left + r.width/2, y: r.top + r.height/2, w:r.width, h:r.height };
+      return {x:r.left + r.width/2, y:r.top + r.height/2, w:r.width, h:r.height, left:r.left, top:r.top};
     }
 
-    function fleeFrom(mx, my){
-      const c = centerOf(noBtn);
-      const dx = c.x - mx;
-      const dy = c.y - my;
+    function clampToViewport(x, y){
+      const r = noBtn.getBoundingClientRect();
+      const nx = Math.min(window.innerWidth - r.width - MARGIN, Math.max(MARGIN, x));
+      const ny = Math.min(window.innerHeight - r.height - MARGIN, Math.max(MARGIN, y));
+      return {x:nx, y:ny};
+    }
+
+    // weiches Tweening
+    function tick(){
+      pos.x += (target.x - pos.x) * 0.15; // easing
+      pos.y += (target.y - pos.y) * 0.15;
+      applyNo();
+      requestAnimationFrame(tick);
+    }
+
+    // Repulsion vom Cursor + Mindestabstand zu YES
+    function flee(mx, my){
+      const nc = centerRect(noBtn);
+      const dx = nc.x - mx;
+      const dy = nc.y - my;
       const dist = Math.hypot(dx, dy);
 
+      let tx = nc.x, ty = nc.y;
+
       if (dist < SAFE_RADIUS){
-        // Make YES grow only the first time NO flees
-        if (!grownOnce){
-          yesBtn.style.transform = 'scale(1.18)';
-          grownOnce = true;
-          // reset back after a short cute bounce
-          setTimeout(()=> yesBtn.style.transform = 'scale(1.08)', 160);
-          setTimeout(()=> yesBtn.style.transform = 'scale(1.00)', 420);
-        }
-
-        // Move NO opposite to cursor with a bit of randomness
-        const ux = dx / (dist || 1);
-        const uy = dy / (dist || 1);
-        const jitter = () => (Math.random()-0.5) * 80;
-
-        const targetX = c.x + ux * PUSH + jitter();
-        const targetY = c.y + uy * PUSH + jitter();
-
-        setNoPos(targetX - c.w/2, targetY - c.h/2);
+        const ux = dx / (dist || 1), uy = dy / (dist || 1);
+        const jitter = () => (Math.random()-0.5) * 50;
+        tx += ux * PUSH_STRENGTH + jitter();
+        ty += uy * PUSH_STRENGTH + jitter();
       }
+
+      // Zusätzlich von YES fernhalten
+      const yc = centerRect(yesBtn);
+      const dyx = tx - yc.x, dyy = ty - yc.y;
+      const d2 = Math.hypot(dyx, dyy);
+      if (d2 < MIN_DISTANCE_TO_YES){
+        const ux = dyx / (d2 || 1), uy = dyy / (d2 || 1);
+        const push = MIN_DISTANCE_TO_YES - d2 + 20;
+        tx += ux * push;
+        ty += uy * push;
+      }
+
+      const clamped = clampToViewport(tx - nc.w/2, ty - nc.h/2);
+      target = clamped;
     }
 
-    // Mouse chase across the whole page
-    document.addEventListener('mousemove', (e) => fleeFrom(e.clientX, e.clientY));
-
-    // If you actually reach the button, jump away instantly
-    noBtn.addEventListener('pointerenter', () => {
-      const r = noBtn.getBoundingClientRect();
-      const rndX = r.left + (Math.random() * 600 - 300);
-      const rndY = r.top  + (Math.random() * 400 - 200);
-      setNoPos(rndX, rndY);
-    });
-
-    // Touch support: tap near NO -> it moves
-    document.addEventListener('touchstart', (e) => {
-      const t = e.touches[0];
-      if (!t) return;
-      fleeFrom(t.clientX, t.clientY);
+    // Hover/Touch-Events
+    document.addEventListener('mousemove', e => flee(e.clientX, e.clientY));
+    document.addEventListener('touchstart', e => {
+      const t = e.touches[0]; if (t) flee(t.clientX, t.clientY);
     }, {passive:true});
 
-    // YES action
+    // Falls man ihn doch erreicht – kleiner Not-Sprung
+    noBtn.addEventListener('pointerenter', () => {
+      const r = noBtn.getBoundingClientRect();
+      const jumpX = r.left + (Math.random()*600 - 300);
+      const jumpY = r.top  + (Math.random()*400 - 200);
+      const c = clampToViewport(jumpX, jumpY);
+      target = c;
+    });
+
+    // YES: einmalig größer + Yay, Foto, Konfetti
+    let grownOnce = false;
     yesBtn.addEventListener('click', () => {
-      // Hide buttons & hint
+      if (!grownOnce){
+        yesBtn.style.transform = 'scale(1.18)';
+        setTimeout(()=> yesBtn.style.transform = 'scale(1.00)', 380);
+        grownOnce = true;
+      }
       yesBtn.style.display = 'none';
       noBtn.style.display = 'none';
       hint.style.display = 'none';
 
-      // Show yay + image if available
+      // Yay zeigen
       yay.style.display = 'block';
 
-      // Display the image only if it loads successfully
-      if (img){
-        const tryShow = () => { img.style.display = 'block'; };
-        img.addEventListener('load', tryShow, { once: true });
-        // If already cached or missing, try to show anyway; if 404, it just won’t render
-        setTimeout(tryShow, 50);
-      }
+      // Foto einfügen (PDF oder Bild)
+      const PHOTO_FILE = "WhatsApp%20Image%202026-01-31%20at%2020.45.11.PDF"; // exakt so im Repo
+      const isPdf = PHOTO_FILE.toLowerCase().endsWith('.pdf');
+      wrap.innerHTML = isPdf
+        ? `<object class="celebration-pdf" type="application/pdf" data="${PHOTO_FILE}" aria-label="Foto"></object>`
+        : `<img class="celebration-img" src="${PHOTO_FILE}" alt="Foto">`;
+      wrap.style.display = 'block';
 
-      // Confetti burst
+      // Konfetti
       if (window.confetti){
-        const end = Date.now() + 700;
+        const end = Date.now() + 900;
         (function frame(){
           confetti({
-            particleCount: 60,
+            particleCount: 70,
             spread: 70,
             origin: { y: 0.6 },
             scalar: 0.9,
@@ -368,18 +318,36 @@
       }
     });
 
-    // --- QR Code for current URL ---
-    window.addEventListener('load', () => {
-      const target = (location.origin && location.href.startsWith('http')) ? location.href : 'https://your-github-pages-url';
-      const qr = new QRCode(document.getElementById("qrcode"), {
-        text: target,
-        width: 120,
-        height: 120,
-        colorDark: "#111111",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-      });
+    // QR: Icon toggelt Modal (kein Text im Layout)
+    const qrFab = document.getElementById('qrFab');
+    const qrModal = document.getElementById('qrModal');
+    const qrBox = document.getElementById('qrcode');
+    let qrBuilt = false;
+
+    qrFab.addEventListener('click', () => {
+      qrModal.style.display = 'grid';
+      if (!qrBuilt && window.QRCode){
+        const target = (location.origin && location.href.startsWith('http')) ? location.href : 'https://your-github-pages-url';
+        new QRCode(qrBox, {
+          text: target, width: 160, height: 160,
+          colorDark: "#111111", colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+        qrBuilt = true;
+      }
     });
+    qrModal.addEventListener('click', (e) => {
+      if (e.target === qrModal) qrModal.style.display = 'none';
+    });
+
+    // init
+    window.addEventListener('load', () => {
+      placeNoInitial();
+      tick();
+    });
+
+    // Re-Layout bei Resize
+    window.addEventListener('resize', placeNoInitial);
   </script>
 </body>
 </html>
