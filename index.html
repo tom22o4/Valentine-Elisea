@@ -9,7 +9,7 @@
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-  <!-- Confetti + QR -->
+  <!-- Confetti (nur fürs „Yay“) + QR (Icon ohne Text, kann man leicht entfernen) -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
@@ -20,18 +20,16 @@
       --bg-a:#ffe3ea;
       --bg-b:#fad0c4;
       --shadow:0 18px 40px rgba(255,77,109,.25);
-      --safe-inset: 8px; /* NEW: engerer Rand für Mobile, damit NO sichtbar bleibt */
+      --safe-inset: 10px;         /* Rand, damit NO nie rausfällt */
+      --scroll-reveal-dist: 10px; /* Variante A: sehr zart, 10px */
     }
     *{box-sizing:border-box}
     body{
-      margin:0; 
+      margin:0;
       min-height:100svh;
-      display:flex; 
-      align-items:center; 
-      justify-content:center;
+      display:flex; align-items:center; justify-content:center;
       background: radial-gradient(1200px 800px at 20% 10%, var(--bg-a) 0%, var(--bg-b) 45%, #ff9a9e 100%);
-      /* NEW: Scroll erlauben, damit Text unter Bild sichtbar wird */
-      overflow:auto;
+      overflow:auto; /* Scroll erlauben */
       font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
     }
 
@@ -59,7 +57,7 @@
       box-shadow: var(--shadow);
       border:1px solid rgba(255,255,255,.6);
       text-align:center;
-      margin: 24px 0; /* NEW: Platz oben/unten → Scrollraum */
+      margin: 24px 0; /* Scrollraum oben/unten */
     }
     h1.title{
       font-family:'Pacifico', cursive; font-weight:400; margin:4px 0 12px;
@@ -115,15 +113,20 @@
     }
     .celebration-pdf{ height:460px; border-radius:18px; }
 
-    /* Liebes-Zeile unter dem Bild */
+    /* Liebes-Zeile unter dem Bild mit sanfter Scroll-Reveal (Variante A) */
     .love-line{ 
       margin:14px 0 6px; 
       font-weight:600; 
       font-size:clamp(18px, 4.2vw, 22px);
       color:#c81e53;
+      opacity:0; transform: translateY(var(--scroll-reveal-dist));
+      transition: opacity .6s ease, transform .6s ease; /* zart, smooth */
+    }
+    .love-line.revealed{
+      opacity:1; transform: translateY(0);
     }
 
-    /* QR Icon (ohne Text) */
+    /* QR Icon (ohne Text) – optional, kann entfernt werden */
     .qr-fab{
       position:fixed; right:14px; top:14px; z-index:4;
       background:#fff; border-radius:14px; padding:8px 10px;
@@ -144,7 +147,7 @@
 
     button:focus-visible{ outline:3px solid rgba(255,77,109,.55); outline-offset:3px; }
 
-    /* NEW: sanfteres Verhalten auf sehr kleinen Screens */
+    /* Kleinere Screens: etwas zahmer */
     @media (max-width: 480px){
       :root{ --safe-inset: 12px; }
     }
@@ -163,7 +166,6 @@
       <!-- „No“ ist global fixiert; hier bleibt nur Yes -->
     </div>
 
-    <!-- NEW: Hinweistext geändert -->
     <div class="hint" id="noHint">„No“ ist schüchtern 😘</div>
 
     <div id="yay" aria-live="polite">
@@ -173,17 +175,19 @@
       <!-- Foto-Container: zeigt automatisch PDF (object) oder Bild (img) -->
       <div class="celebration-wrap" id="celebrationWrap"></div>
 
-      <!-- NEW: Liebes-Zeile unter dem Bild -->
-      <div class="love-line" id="loveLine" style="display:none;">
-        Ich liebe dich über alles, Prinzessin ❤️❤️❤️
+      <!-- Liebes-Zeile unter dem Bild (mit sanfter Scroll-Animation – Variante A) -->
+      <div class="love-line" id="loveLine" aria-live="polite" aria-atomic="true">
+        Danke, dass du auch dieses Jahr wieder mich ausgewählt hast.<br>
+        Ich werde alles dafür tun, dich glücklich zu machen, mein Herz.<br>
+        Ich liebe dich wirklich über alles, Prinzessin ❤️❤️❤️❤️❤️
       </div>
     </div>
   </div>
 
-  <!-- NO Button (fixed) -->
+  <!-- NO Button (fixed, damit er über die ganze Seite fliehen kann) -->
   <button id="no" aria-label="No">No 🙈</button>
 
-  <!-- QR Icon + Modal -->
+  <!-- QR Icon + Modal (ohne sichtbaren Text im Layout) -->
   <div class="qr-fab" id="qrFab" title="QR anzeigen">🔳</div>
   <div class="qr-modal" id="qrModal" role="dialog" aria-modal="true" aria-label="QR-Code">
     <div class="qr-card">
@@ -216,17 +220,16 @@
     const yay     = document.getElementById('yay');
     const hint    = document.getElementById('noHint');
     const wrap    = document.getElementById('celebrationWrap');
-    const titleEl = document.getElementById('title');       // NEW
-    const loveEl  = document.getElementById('loveLine');    // NEW
+    const titleEl = document.getElementById('title');
+    const loveEl  = document.getElementById('loveLine');
 
     /* ========== Start-Positionen & Abstände ========== */
-    const SAFE_INSET = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-inset')) || 8; // NEW
+    const SAFE_INSET = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-inset')) || 10;
     const MARGIN = SAFE_INSET;
     const MIN_DISTANCE_TO_YES = 190; // kein Überlappen
-    // Basiswerte mit Anpassung für kleine Viewports
-    const isSmall = () => Math.min(window.innerWidth, window.innerHeight) < 520; // NEW
-    const baseSafe = () => isSmall() ? 120 : 160;  // NEW
-    const basePush = () => isSmall() ? 220 : 280;  // NEW
+    const isSmall = () => Math.min(window.innerWidth, window.innerHeight) < 520;
+    const baseSafe = () => isSmall() ? 120 : 160;
+    const basePush = () => isSmall() ? 220 : 280;
     const EASE = 0.16;
 
     let SAFE_RADIUS  = baseSafe();
@@ -244,7 +247,6 @@
       pos = clampToViewport(startX, startY);
       target = {...pos};
       applyNo();
-      // NEW: Parameter für aktuelle Displaygröße anpassen
       SAFE_RADIUS = baseSafe();
       PUSH_STRENGTH = basePush();
     }
@@ -285,7 +287,6 @@
 
       if (dist < SAFE_RADIUS){
         const ux = dx / (dist || 1), uy = dy / (dist || 1);
-        // etwas weniger jitter auf Mobile
         const jitter = () => (Math.random()-0.5) * (isSmall() ? 30 : 50);
         tx += ux * PUSH_STRENGTH + jitter();
         ty += uy * PUSH_STRENGTH + jitter();
@@ -302,7 +303,6 @@
         ty += uy * push;
       }
 
-      // NEW: harte Begrenzung innerhalb des Viewports – NO bleibt sichtbar
       const halfW = nc.w/2, halfH = nc.h/2;
       const clamped = clampToViewport(tx - halfW, ty - halfH);
       target = clamped;
@@ -332,23 +332,21 @@
       }
       yesBtn.style.display = 'none';
       noBtn.style.display = 'none';
-      if (titleEl) titleEl.style.display = 'none';   // NEW: Titel weg
+      if (titleEl) titleEl.style.display = 'none';   // Titel weg
       hint.style.display = 'none';
 
       // Yay zeigen
       yay.style.display = 'block';
 
       // Foto einfügen (PDF oder Bild)
-      // HINWEIS: Passe diesen Dateinamen an, wenn du ein JPG/PNG/GIF nutzt.
-      const PHOTO_FILE = "Love.jpeg"; // ggf. ändern, z. B.: "assets/cute.jpg"
+      // *** HIER DEIN BILD: ***
+      // Wenn dein Bild in assets/ liegt, ändere zu: const PHOTO_FILE = "assets/Love.jpeg";
+      const PHOTO_FILE = "Love.jpeg";
       const isPdf = PHOTO_FILE.toLowerCase().endsWith('.pdf');
       wrap.innerHTML = isPdf
         ? `<object class="celebration-pdf" type="application/pdf" data="${PHOTO_FILE}" aria-label="Foto"></object>`
-        : `<img class="celebration-img" src="${PHOTO_FILE}" alt="Unser Bild">`;
+        : `<img class="celebration-img" src="${PHOTO_FILE}" alt="Love" loading="lazy">`;
       wrap.style.display = 'block';
-
-      // NEW: Liebeszeile zeigen (unter dem Bild, dadurch Scroll möglich)
-      loveEl.style.display = 'block';
 
       // Konfetti
       if (window.confetti){
@@ -364,6 +362,11 @@
           if (Date.now() < end) requestAnimationFrame(frame);
         })();
       }
+
+      // Scroll-Reveal aktivieren, sobald der Liebestext in Sicht kommt
+      setupScrollReveal();
+      // ein klein wenig nach unten scrollen, damit man den Effekt sieht (optional, zart)
+      setTimeout(()=> window.scrollBy({top: 40, behavior:'smooth'}), 400);
     });
 
     // QR: Icon toggelt Modal (kein extra Text im Layout)
@@ -396,6 +399,20 @@
 
     // Re-Layout bei Resize
     window.addEventListener('resize', placeNoInitial);
+
+    /* ====== Sanfte Scroll-Animation (Variante A) ====== */
+    function setupScrollReveal(){
+      if (!loveEl) return;
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting){
+            loveEl.classList.add('revealed');
+            obs.disconnect();
+          }
+        });
+      }, { root: null, threshold: 0.2 });
+      obs.observe(loveEl);
+    }
   </script>
 </body>
 </html>
